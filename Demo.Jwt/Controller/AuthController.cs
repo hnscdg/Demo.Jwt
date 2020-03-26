@@ -19,6 +19,7 @@ namespace Demo.Jwt.Controller
         [HttpGet]
         public IActionResult Get(string username, string pwd)
         {
+            // 如果用户名和密码不为空，则验证通过
             if (!string.IsNullOrEmpty(username) && ! string.IsNullOrEmpty(pwd)) 
             {
                 // push the user's name into a claim, so we can identify the user later on
