@@ -29,14 +29,17 @@ namespace Demo.Jwt.Controller
         public IActionResult Get(string userName, string pwd)
         {
             // 如果用户名和密码不为空，则验证通过
-            if (!string.IsNullOrEmpty(userName) && ! string.IsNullOrEmpty(pwd)) 
+            if (CheckAccount(userName, pwd, out string role)) 
             {
+                // 每次登陆动态刷新
+                Const.ValidAudience = userName + pwd + DateTime.Now.ToString();
                 // push the user's name into a claim, so we can identify the user later on
                 var claims = new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Nbf, $"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}"),
                     new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddMinutes(30)).ToUnixTimeSeconds()}"),
-                    new Claim(ClaimTypes.NameIdentifier, userName)
+                    new Claim(ClaimTypes.NameIdentifier, userName),
+                    new Claim("Role", role)
                 };
 
                 // sign the token using a security key, This secret will be shared between api and anything that needs to check that the token is legit.
@@ -49,7 +52,7 @@ namespace Demo.Jwt.Controller
                     //颁发者
                     issuer: Const.Domain,
                     // 接收者
-                    audience: Const.Domain,
+                    audience: Const.ValidAudience,
                     // user-defined claims
                     claims: claims,
                     // expires time
@@ -66,5 +69,26 @@ namespace Demo.Jwt.Controller
                 return BadRequest(new { message = "user or password is incorrect" });
             }
         }
+    
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="pwd"></param>
+        /// <param name="role"></param>
+        /// <returns></returns>
+        private bool CheckAccount(string userName, string pwd, out string role) 
+        {
+            role = "user";
+            if (string.IsNullOrEmpty(userName)) return false;
+
+            if (userName.Equals("admin")) role = "admin";
+
+            return true;
+        }
+    
     }
+
+
+
 }
