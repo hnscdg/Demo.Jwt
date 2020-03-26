@@ -14,7 +14,7 @@ namespace Demo.Jwt
         /// <summary>
         /// 站点地址
         /// </summary>
-        public const string Domain = "http://localhost:5000";
+        public const string Domain = "http://localhost:51199";
 
         /// <summary>
         /// 受理人，之所以弄成可变的是为了用接口动态更改这个值以模拟强制Token失效

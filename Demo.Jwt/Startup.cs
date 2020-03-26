@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Demo.Jwt.AuthManagement;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,7 +33,16 @@ namespace Demo.Jwt
         // or see website for more information https://www.cnblogs.com/7tiny/p/11012035.html about jwt authentication
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //添加策略鉴权模式
+            services.AddAuthorization(options => {
+                options.AddPolicy("Permission", policy => policy.Requirements.Add(new PolicyRequirement()));
+            })
+                .AddAuthentication(s => {
+                    // 添加JWT Scheme
+                    s.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    s.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                    s.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 
                 // 添加JWT验证：
                 .AddJwtBearer(options =>
@@ -49,6 +60,9 @@ namespace Demo.Jwt
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Const.SecurityKey))
                     };
                 });
+
+            services.AddSingleton<IAuthorizationHandler, PolicyHandler>();
+
             services.AddMvc(options => { options.EnableEndpointRouting = false; }).SetCompatibilityVersion(Microsoft.AspNetCore.Mvc.CompatibilityVersion.Version_3_0);
         }
 

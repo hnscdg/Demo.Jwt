@@ -16,8 +16,8 @@ namespace Demo.Jwt.AuthManagement
         public string DeniedAction { get; set; }
         public PolicyRequirement()
         {
-            DeniedAction = new PathString("api/nopermission");
-            UserPermissions = new List<UserPermission> { new UserPermission { Url="api/values", UserName="admin" } };
+            DeniedAction = new PathString("/api/nopermission");
+            UserPermissions = new List<UserPermission> { new UserPermission { Url="/api/value3", UserName="admin" } };
         }
     }
 

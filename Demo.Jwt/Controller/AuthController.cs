@@ -12,22 +12,31 @@ using Microsoft.IdentityModel.Tokens;
 namespace Demo.Jwt.Controller
 {
     [ApiController]
-    [Route("api/[controller]")]
+    //[Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         [AllowAnonymous]
         [HttpGet]
-        public IActionResult Get(string username, string pwd)
+        [Route("api/nopermission")]
+        public IActionResult NoPermission()
+        {
+            return Forbid("No Permission");
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("api/auth")]
+        public IActionResult Get(string userName, string pwd)
         {
             // 如果用户名和密码不为空，则验证通过
-            if (!string.IsNullOrEmpty(username) && ! string.IsNullOrEmpty(pwd)) 
+            if (!string.IsNullOrEmpty(userName) && ! string.IsNullOrEmpty(pwd)) 
             {
                 // push the user's name into a claim, so we can identify the user later on
                 var claims = new[]
                 {
                     new Claim(JwtRegisteredClaimNames.Nbf, $"{new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds()}"),
                     new Claim(JwtRegisteredClaimNames.Exp, $"{new DateTimeOffset(DateTime.Now.AddMinutes(30)).ToUnixTimeSeconds()}"),
-                    new Claim(ClaimTypes.NameIdentifier, username)
+                    new Claim(ClaimTypes.NameIdentifier, userName)
                 };
 
                 // sign the token using a security key, This secret will be shared between api and anything that needs to check that the token is legit.
